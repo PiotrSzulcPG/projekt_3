@@ -22,7 +22,7 @@ scikit_build_example.add(1, 2)
 
 * `.github`: configuration for [Dependabot][] and [GitHub Actions][]
 * `conda.recipe`: Example recipe. Normally you should submit projects to conda-forge instead of building them yourself, but this is useful for testing the example.
-* 
+
 ## License
 
 pybind11 is provided under a BSD-style license that can be found in the LICENSE
