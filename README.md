@@ -2,12 +2,12 @@
 ## Installation
 
 - Clone this repository
-- `pip install ./scikit_build_example`
+- `pip install ./projekt_3`
 
 ## Test call
 
 ```python
-import scikit_build_example
+import scikit_build_example // TODO: zmiana nazwy (w pyproject.toml?)
 
 scikit_build_example.add(1, 2)
 ```
