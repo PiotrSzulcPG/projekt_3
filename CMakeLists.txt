@@ -12,6 +12,7 @@ project(
 # Find the module development requirements (requires FindPython from 3.17 or
 # scikit-build-core's built-in backport)
 # add_subdirectory(extern/pybind11) # mo¿na dodaæ pybind11 jako element repozytorium
+add_subdirectory(matplotplusplus)
 find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
 find_package(pybind11 CONFIG REQUIRED)
 
@@ -19,6 +20,7 @@ find_package(pybind11 CONFIG REQUIRED)
 # this)
 python_add_library(_core MODULE src/main.cpp WITH_SOABI)
 target_link_libraries(_core PRIVATE pybind11::headers)
+target_link_libraries(_core PUBLIC matplot)
 
 # This is passing in the version as a define just as an example
 target_compile_definitions(_core PRIVATE VERSION_INFO=${PROJECT_VERSION})
