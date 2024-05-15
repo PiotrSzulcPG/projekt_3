@@ -1,9 +1,11 @@
 #include <pybind11/pybind11.h>
+#include <iostream>
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 
 int add(int i, int j) {
+    std::cout << "Siemanko" << endl;
     return i + j;
 }
 
