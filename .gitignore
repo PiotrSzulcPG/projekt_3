@@ -142,3 +142,7 @@ cython_debug/
 
 _skbuild/
 .pyodide-xbuildenv/
+
+# VS files (addded by Piotr Szulc)
+
+.vs
