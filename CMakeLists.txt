@@ -15,7 +15,6 @@ project(
 # set(CMAKE_PREFIX_PATH "%appdata%/Python/share/cmake/pybind11")
 # set(pybind11_DIR %appdata%/Python/Python312/Include/pybind11-global/pybind11)
 add_subdirectory(extern/matplotplusplus)
-add_subdirectory(extern/AudioFile)
 
 find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
 find_package(pybind11 CONFIG REQUIRED) # Fix TODO (nie dzia³a): w CMD wpisaæ "set pybind11_DIR=%appdata%\Roaming\Python\share\cmake\pybind11" a nastêpnie "cmake ."
@@ -25,7 +24,6 @@ find_package(pybind11 CONFIG REQUIRED) # Fix TODO (nie dzia³a): w CMD wpisaæ "se
 python_add_library(_core MODULE src/main.cpp WITH_SOABI)
 target_link_libraries(_core PRIVATE pybind11::headers)
 target_link_libraries(_core PUBLIC matplot)
-target_link_libraries(_core PUBLIC AudioFile)
 
 # This is passing in the version as a define just as an example
 target_compile_definitions(_core PRIVATE VERSION_INFO=${PROJECT_VERSION})
