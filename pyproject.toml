@@ -6,7 +6,7 @@ build-backend = "scikit_build_core.build"
 [project]
 name = "scikit_build_example"
 version = "0.0.1"
-description="A minimal example package (with pybind11)"
+description="Package done for project 3 on PG with audio visualisation and couple benefits"
 readme = "README.md"
 authors = [
   { name = "My Name", email = "me@email.com" },

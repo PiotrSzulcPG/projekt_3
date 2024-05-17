@@ -146,3 +146,4 @@ _skbuild/
 # VS files (addded by Piotr Szulc)
 
 .vs
+/CMakeSettings.json

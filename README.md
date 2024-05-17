@@ -1,3 +1,5 @@
+### README OUTDATED! ###
+
 # projekt3_test
 ## Installation
 
