@@ -17,7 +17,7 @@ project(
 add_subdirectory(extern/matplotplusplus)
 
 find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
-find_package(pybind11 CONFIG REQUIRED) # Fix TODO (nie dzia³a): w CMD wpisaæ "set pybind11_DIR=%appdata%\Roaming\Python\share\cmake\pybind11" a nastêpnie "cmake ."
+find_package(pybind11 CONFIG REQUIRED)
 
 # Add a library using FindPython's tooling (pybind11 also provides a helper like
 # this)
