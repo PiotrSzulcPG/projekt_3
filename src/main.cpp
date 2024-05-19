@@ -50,10 +50,13 @@ py::array_t<double> filter_signal(py::array_t<double> data_array, std::string ty
             double filter[3] = {1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0};
         }
         if (type == "hpf") { // high-pass filter
-            double filter[3] = {-1.0, 2.0, -1.0};
+            double filter[3] = {0.0, -1.0, 1.0};
         }
         if (type == "lpl") { // Laplacian filter
             double filter[3] = {1.0, -2.0, 1.0};
+        }
+        else {
+            throw std::runtime_error("There is no filter with that code. Check misspelling.");
         }
 
         auto get_cell = [&](int cell) -> double {
@@ -79,12 +82,17 @@ py::array_t<double> filter_signal(py::array_t<double> data_array, std::string ty
         double* input_ptr = static_cast<double*>(buf.ptr);
         double* result_ptr = static_cast<double*>(result_buf.ptr);
 
-        auto get_pixel = [&](int r, int c) -> double {
+        auto get_pixel = [&](int r, int c, int ch) -> double {
             if (r < 0 || r >= rows || c < 0 || c >= cols) {
                 return 0.0;
             }
-            return input_ptr[r * cols + c];
+            return input_ptr[(r * cols + c) * RGB + ch];
         };
+
+        double filter[3][3] = { // If incorrect type
+            {0.0, 0.0, 0.0},
+            {0.0, 1.0, 0.0},
+            {0.0, 0.0, 0.0} };
 
         if (type == "shp") { // Sharpen
             double filter[3][3] = {
@@ -93,7 +101,7 @@ py::array_t<double> filter_signal(py::array_t<double> data_array, std::string ty
             {0.0, -1.0, 0.0} };
         }
         if (type == "gbl") { // Gaussian blur
-            double filterl[3][3] = {
+            double filter[3][3] = {
             {1 / 16.0, 2 / 16.0, 1 / 16.0},
             {2 / 16.0, 4 / 16.0, 2 / 16.0},
             {1 / 16.0, 2 / 16.0, 1 / 16.0} };
@@ -109,6 +117,19 @@ py::array_t<double> filter_signal(py::array_t<double> data_array, std::string ty
             {-2.0, -1.0, 0.0},
             {-1.0, 1.0, 1.0},
             {0.0, 1.0, 2.0} };
+        }
+        else {
+            throw std::runtime_error("There is no filter with that code. Check misspelling.");
+        }
+
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                for (int ch = 0; ch < RGB; ch++) {
+                    result_ptr[(r * cols + c) * RGB + ch] = get_pixel(r - 1, c - 1, ch) * filter[0][0] + get_pixel(r - 1, c, ch) * filter[0][1] + get_pixel(r - 1, c + 1, ch) * filter[0][2]
+                                                          + get_pixel(r + 0, c - 1, ch) * filter[1][0] + get_pixel(r + 0, c, ch) * filter[1][1] + get_pixel(r + 0, c + 1, ch) * filter[1][2]
+                                                          + get_pixel(r + 1, c - 1, ch) * filter[2][0] + get_pixel(r + 1, c, ch) * filter[2][1] + get_pixel(r + 1, c + 1, ch) * filter[2][2];
+                }
+            }
         }
 
     }
