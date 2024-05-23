@@ -10,13 +10,13 @@
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 
 namespace py = pybind11;
-
+namespace mat= matplot;
 int add(int i, int j) {
     std::cout << "Siemanko" << std::endl;
     return i + j;
 }
 
-void matplot_example(py::array_t<double> x, py::array_t<double> y)
+void matplot_1d_example(py::array_t<double> x, py::array_t<double> y)
 {
     py::buffer_info buf_x = x.request();
     py::buffer_info buf_y = y.request();
@@ -37,16 +37,39 @@ void matplot_example(py::array_t<double> x, py::array_t<double> y)
         v_x.push_back(x.at(i));
         v_y.push_back(y.at(i));
     }
-    matplot::plot(v_x, v_y)->color({ 0.f, 0.7f, 0.9f });
-    matplot::title("1-D Line Plot");
-    matplot::xlabel("x");
-    matplot::ylabel("y");
+    mat::plot(v_x, v_y)->color({ 0.f, 0.7f, 0.9f });
+    mat::title("1-D Line Plot");
+    mat::xlabel("x");
+    mat::ylabel("y");
 
-    matplot::show();
-    matplot::save("raport/sine_plot", "png");
+    mat::show();
+    mat::save("raport/sine_plot", "png");
 }
 
+void matplot_1d_one_input(py::array_t<double> y)
+{
+    py::buffer_info buf_y = y.request();
+    if (buf_y.ndim != 1)
+    {
+        std::cout << "invalid dimensions";
+        return;
+    }
+    int size = buf_y.shape[0];
+    std::vector<double> v_x, v_y;
+    for (int i = 0; i < size; i++)
+    {
+        v_y.push_back(y.at(i));
+    }
+    v_x = mat::linspace(0,size,size);
 
+    mat::plot(v_x, v_y)->color({ 0.f, 0.7f, 0.9f });
+    mat::title("1-D Line Plot");
+    mat::xlabel("x");
+    mat::ylabel("y");
+
+    mat::show();
+    mat::save("raport/one_input_sine_plot", "png");
+}
 py::array_t<double> filter_signal(py::array_t<double> data_array, std::string type) { // , py::array_t<double> filter_array
     py::buffer_info buf = data_array.request();
 
@@ -226,7 +249,9 @@ PYBIND11_MODULE(_core, m) {
         Some other explanation about the subtract function.
     )pbdoc");
 
-    m.def("graph_example", &matplot_example, "function generating a graph using matplot");
+    m.def("two_input_1d", &matplot_1d_example, "function generating a graph with two inputs using matplot");
+
+    m.def("one_input_1d", &matplot_1d_one_input, "function generating a graph with one input using matplot");
 
     m.def("detect_edge", &detect_edge, R"pbdoc(
         Takes 2D array as an input and outputs edge detection using Sobel operator
@@ -234,6 +259,7 @@ PYBIND11_MODULE(_core, m) {
         Some other explanation about the edge detection.
     )pbdoc");
 
+    m.def("filter_signal", &filter_signal, "function used to filter a signal");
 #ifdef VERSION_INFO
     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
 #else
