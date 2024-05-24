@@ -86,8 +86,8 @@ py::array_t<double> filter_signal(py::array_t<double> data_array, std::string ty
         if (type == "mdn") { // Median
             filter[0] = 1.0; filter[1] = 1.0; filter[2] = 1.0;
         }
-        else if (type == "lpf") { // Low-pass filter
-            filter[0] = filter[1] = filter[2] = 1.0 / 3.0;
+        else if (type == "sob") { // Low-pass filter
+            filter[0] = -1.0; filter[1] = 0.0; filter[2] = 1.0;
         }
         else if (type == "hpf") { // High-pass filter
             filter[0] = 0.0; filter[1] = -1.0; filter[2] = 1.0;
@@ -292,9 +292,10 @@ PYBIND11_MODULE(_core, m) {
 
         Parameters:
         Amplitude []: How big is amplitude in a signal, or in other words how loud is the audio
-        Frequency [Hz]: 
-        Length [seconds]
-        Phase []
+        Frequency [Hz]: How often should signal be [insert definition of frequency here]
+        Length [seconds]: How long should the signal be, in seconds
+        Phase [rad]: offset
+        rate [Hz]:
         
         Some other explanation about the signal generation.
     )pbdoc");
@@ -304,7 +305,7 @@ PYBIND11_MODULE(_core, m) {
         **Filter IDs:**
         1D:
         * mdn - Media
-        * lpf - Low-pass filter
+        * sob - Sobel filter (edge detection)
         * hpf - High-pass filter
         * lpl - Laplacian filter (derivative)
 
