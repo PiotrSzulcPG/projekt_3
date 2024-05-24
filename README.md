@@ -11,7 +11,7 @@
 ```python
 import scikit_build_example // TODO: zmiana nazwy (w pyproject.toml?)
 
-scikit_build_example.add(1, 2)
+scikit_build_example.greeting()
 ```
 
 ## Deleted files from original scikit_build_example
@@ -19,11 +19,6 @@ scikit_build_example.add(1, 2)
 * `docs/`: Documentation
 * `.pre-commit-config.yaml`: Configuration for the fantastic static-check runner [pre-commit][].
 * `noxfile.py`: Configuration for the [nox][] task runner, which helps make setup easier for contributors.
-
-## Files considered for deletion
-
-* `.github`: configuration for [Dependabot][] and [GitHub Actions][]
-* `conda.recipe`: Example recipe. Normally you should submit projects to conda-forge instead of building them yourself, but this is useful for testing the example.
 
 ## License
 
