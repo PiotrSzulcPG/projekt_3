@@ -301,8 +301,6 @@ PYBIND11_MODULE(_core, m) {
         Some other explanation about the signal generation.
     )pbdoc");
 
-    m.def("graph_example", &matplot_example, "function generating a graph using matplot");
-
     m.def("filter_signal", &filter_signal, R"pbdoc(
         Filter 1D or 2D RGB signal based on given filter ID.
         **Filter IDs:**
