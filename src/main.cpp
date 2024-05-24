@@ -30,7 +30,7 @@ int example_graph() {
 }
 
 
-py::array_t<double> filter_signal(py::array_t<double> data_array, std::string type) { // , py::array_t<double> filter_array
+py::array_t<double> filter_signal(py::array_t<double> data_array, std::string type) {
     py::buffer_info buf = data_array.request();
 
     if (buf.ndim == 1) {
@@ -42,21 +42,22 @@ py::array_t<double> filter_signal(py::array_t<double> data_array, std::string ty
         double* input_ptr = static_cast<double*>(buf.ptr);
         double* result_ptr = static_cast<double*>(result_buf.ptr);
 
-        double filter[3] = { 0.0, 1.0, 0.0 }; // if incorrect type
+        double filter[3] = { 0.0, 1.0, 0.0 }; // Default filter for incorrect type
+
         if (type == "mdn") { // Median
-            double filter[3] = {1.0, 1.0, 1.0};
+            filter[0] = 1.0; filter[1] = 1.0; filter[2] = 1.0;
         }
-        if (type == "lpf") { // low-pass filter
-            double filter[3] = {1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0};
+        else if (type == "lpf") { // Low-pass filter
+            filter[0] = filter[1] = filter[2] = 1.0 / 3.0;
         }
-        if (type == "hpf") { // high-pass filter
-            double filter[3] = {0.0, -1.0, 1.0};
+        else if (type == "hpf") { // High-pass filter
+            filter[0] = 0.0; filter[1] = -1.0; filter[2] = 1.0;
         }
-        if (type == "lpl") { // Laplacian filter
-            double filter[3] = {1.0, -2.0, 1.0};
+        else if (type == "lpl") { // Laplacian filter
+            filter[0] = 1.0; filter[1] = -2.0; filter[2] = 1.0;
         }
         else {
-            throw std::runtime_error("There is no filter with that code. Check misspelling.");
+            throw std::runtime_error("There is no 1D filter with that code. Check misspelling.");
         }
 
         auto get_cell = [&](int cell) -> double {
@@ -64,16 +65,17 @@ py::array_t<double> filter_signal(py::array_t<double> data_array, std::string ty
                 return 0.0;
             }
             return input_ptr[cell];
-        };
+            };
 
-        for (unsigned i = 0; length; i++) {
+        for (unsigned i = 0; i < length; i++) {
             result_ptr[i] = get_cell(i - 1) * filter[0] + get_cell(i) * filter[1] + get_cell(i + 1) * filter[2];
         }
+        return result;
     }
 
-    else if (buf.ndim == 2) {
+    else if (buf.ndim == 3) {
         int rows = buf.shape[0];
-        int cols = buf.shape[1];
+        int columns = buf.shape[1];
         int RGB = buf.shape[2];
 
         auto result = py::array_t<double>(buf.size);
@@ -82,69 +84,67 @@ py::array_t<double> filter_signal(py::array_t<double> data_array, std::string ty
         double* input_ptr = static_cast<double*>(buf.ptr);
         double* result_ptr = static_cast<double*>(result_buf.ptr);
 
-        auto get_pixel = [&](int r, int c, int ch) -> double {
-            if (r < 0 || r >= rows || c < 0 || c >= cols) {
-                return 0.0;
-            }
-            return input_ptr[(r * cols + c) * RGB + ch];
-        };
-
-        double filter[3][3] = { // If incorrect type
+        double filter[3][3] = {
             {0.0, 0.0, 0.0},
             {0.0, 1.0, 0.0},
             {0.0, 0.0, 0.0} };
 
         if (type == "shp") { // Sharpen
-            double filter[3][3] = {
-            {0.0, -1.0, 0.0},
-            {-1.0, 5.0, -1.0},
-            {0.0, -1.0, 0.0} };
+            filter[0][0] = 0.0; filter[0][1] = -1.0; filter[0][2] = 0.0;
+            filter[1][0] = -1.0; filter[1][1] = 5.0; filter[1][2] = -1.0;
+            filter[2][0] = 0.0; filter[2][1] = -1.0; filter[2][2] = 0.0;
         }
-        if (type == "gbl") { // Gaussian blur
-            double filter[3][3] = {
-            {1 / 16.0, 2 / 16.0, 1 / 16.0},
-            {2 / 16.0, 4 / 16.0, 2 / 16.0},
-            {1 / 16.0, 2 / 16.0, 1 / 16.0} };
+        else if (type == "gbl") { // Gaussian blur
+            filter[0][0] = 1 / 16.0; filter[0][1] = 2 / 16.0; filter[0][2] = 1 / 16.0;
+            filter[1][0] = 2 / 16.0; filter[1][1] = 4 / 16.0; filter[1][2] = 2 / 16.0;
+            filter[2][0] = 1 / 16.0; filter[2][1] = 2 / 16.0; filter[2][2] = 1 / 16.0;
         }
-        if (type == "edt") { // Edge detection
-            double filter[3][3] = {
-            {0.0, 1.0, 0.0},
-            {1.0, -4.0, 1.0},
-            {0.0, 1.0, 0.0} };
+        else if (type == "edt") { // Edge detection
+            filter[0][0] = 0.0; filter[0][1] = 1.0; filter[0][2] = 0.0;
+            filter[1][0] = 1.0; filter[1][1] = -4.0; filter[1][2] = 1.0;
+            filter[2][0] = 0.0; filter[2][1] = 1.0; filter[2][2] = 0.0;
         }
-        if (type == "emb") { // Emboss 
-            double filter[3][3] = {
-            {-2.0, -1.0, 0.0},
-            {-1.0, 1.0, 1.0},
-            {0.0, 1.0, 2.0} };
+        else if (type == "emb") { // Emboss
+            filter[0][0] = -2.0; filter[0][1] = -1.0; filter[0][2] = 0.0;
+            filter[1][0] = -1.0; filter[1][1] = 1.0; filter[1][2] = 1.0;
+            filter[2][0] = 0.0; filter[2][1] = 1.0; filter[2][2] = 2.0;
         }
         else {
-            throw std::runtime_error("There is no filter with that code. Check misspelling.");
+            throw std::runtime_error("There is no 2D filter with that code. Check misspelling.");
         }
 
+        auto get_pixel = [&](int r, int c, int ch) -> double {
+            if (r < 0 || r >= rows || c < 0 || c >= columns) {
+                return 0.0;
+            }
+            return input_ptr[(r * columns + c) * RGB + ch];
+            };
+
         for (int r = 0; r < rows; r++) {
-            for (int c = 0; c < cols; c++) {
+            for (int c = 0; c < columns; c++) {
                 for (int ch = 0; ch < RGB; ch++) {
-                    result_ptr[(r * cols + c) * RGB + ch] = get_pixel(r - 1, c - 1, ch) * filter[0][0] + get_pixel(r - 1, c, ch) * filter[0][1] + get_pixel(r - 1, c + 1, ch) * filter[0][2]
-                                                          + get_pixel(r + 0, c - 1, ch) * filter[1][0] + get_pixel(r + 0, c, ch) * filter[1][1] + get_pixel(r + 0, c + 1, ch) * filter[1][2]
-                                                          + get_pixel(r + 1, c - 1, ch) * filter[2][0] + get_pixel(r + 1, c, ch) * filter[2][1] + get_pixel(r + 1, c + 1, ch) * filter[2][2];
+                    result_ptr[(r * columns + c) * RGB + ch] = get_pixel(r - 1, c - 1, ch) * filter[0][0] + get_pixel(r - 1, c, ch) * filter[0][1] + get_pixel(r - 1, c + 1, ch) * filter[0][2] +
+                                                            get_pixel(r, c - 1, ch) * filter[1][0] + get_pixel(r, c, ch) * filter[1][1] + get_pixel(r, c + 1, ch) * filter[1][2] +
+                                                            get_pixel(r + 1, c - 1, ch) * filter[2][0] + get_pixel(r + 1, c, ch) * filter[2][1] + get_pixel(r + 1, c + 1, ch) * filter[2][2];
                 }
             }
         }
 
+        result.reshape({ rows, columns, RGB });
+        return result;
     }
+
     else {
         throw std::runtime_error("Input should be a 1D or 2D RGB NumPy array");
     }
-        
-
 }
+
 
 // Edge detection function (FIX: RGB, not grayscale)
 py::array_t<double> detect_edge(py::array_t<double> data_array) { 
     py::buffer_info buf = data_array.request();
 
-    if (buf.ndim != 2)
+    if (buf.ndim != 3)
         throw std::runtime_error("Input should be a 2D NumPy array");
 
     int rows = buf.shape[0];
@@ -214,6 +214,25 @@ PYBIND11_MODULE(_core, m) {
 
         Some other explanation about the graph function.
     )pbdoc");
+
+    m.def("filter_signal", &filter_signal, R"pbdoc(
+        Filter 1D or 2D RGB signal based on given filter ID.
+        **Filter IDs:**
+        1D:
+        * mdn - Media
+        * lpf - Low-pass filter
+        * hpf - High-pass filter
+        * lpl - Laplacian filter (derivative)
+
+        2D:
+        * shp - Sharpen
+        * gbl - Gaussian Blur
+        * edt - Edge detection
+        * emb - Emboss
+
+        Some other explanation about the signal filtering.
+    )pbdoc");
+
     m.def("detect_edge", &detect_edge, R"pbdoc(
         Takes 2D array as an input and outputs edge detection using Sobel operator
 
