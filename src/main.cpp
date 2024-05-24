@@ -296,9 +296,6 @@ PYBIND11_MODULE(_core, m) {
 
     m.def("one_input_1d", &matplot_1d_one_input, "function generating a graph with one input using matplot");
 
-        Some other explanation about the graph function.
-    )pbdoc");
-
     m.def("generate_signal", &generate_signal, R"pbdoc(
         Generates signal with given amplitude, frequency, length and phaze
 
