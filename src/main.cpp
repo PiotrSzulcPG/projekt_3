@@ -13,9 +13,8 @@ const double PI = 3.14159265;
 
 namespace py = pybind11;
 namespace mat= matplot;
-int add(int i, int j) {
+void greeting() {
     std::cout << "Siemanko" << std::endl;
-    return i + j;
 }
 
 void matplot_1d_example(py::array_t<double> x, py::array_t<double> y)
@@ -274,22 +273,16 @@ PYBIND11_MODULE(_core, m) {
         .. autosummary::
            :toctree: _generate
 
-           add
-           subtract
-           graph_example
+           greeting
+           two_input_1d
+           one_input_1d
+           generate_signal
            detect_edge
+           filter_signal
     )pbdoc";
 
-    m.def("add", &add, R"pbdoc(
-        Add two numbers
-
-        Some other explanation about the add function.
-    )pbdoc");
-
-    m.def("subtract", [](int i, int j) { return i - j; }, R"pbdoc(
-        Subtract two numbers
-
-        Some other explanation about the subtract function.
+    m.def("greeting", &greeting, R"pbdoc(
+        Greets the user
     )pbdoc");
 
     m.def("two_input_1d", &matplot_1d_example, "function generating a graph with two inputs using matplot");
