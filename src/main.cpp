@@ -95,7 +95,7 @@ py::array_t<double> filter_signal(py::array_t<double> data_array, std::string ty
         int columns = buf.shape[1];
         int RGB = buf.shape[2];
 
-        auto result = py::array_t<double>(buf.size);
+        auto result = py::array_t<double>({ rows, columns, RGB });
         auto result_buf = result.request();
 
         double* input_ptr = static_cast<double*>(buf.ptr);
@@ -141,13 +141,12 @@ py::array_t<double> filter_signal(py::array_t<double> data_array, std::string ty
             for (int c = 0; c < columns; c++) {
                 for (int ch = 0; ch < RGB; ch++) {
                     result_ptr[(r * columns + c) * RGB + ch] = get_pixel(r - 1, c - 1, ch) * filter[0][0] + get_pixel(r - 1, c, ch) * filter[0][1] + get_pixel(r - 1, c + 1, ch) * filter[0][2] +
-                                                            get_pixel(r, c - 1, ch) * filter[1][0] + get_pixel(r, c, ch) * filter[1][1] + get_pixel(r, c + 1, ch) * filter[1][2] +
-                                                            get_pixel(r + 1, c - 1, ch) * filter[2][0] + get_pixel(r + 1, c, ch) * filter[2][1] + get_pixel(r + 1, c + 1, ch) * filter[2][2];
+                        get_pixel(r, c - 1, ch) * filter[1][0] + get_pixel(r, c, ch) * filter[1][1] + get_pixel(r, c + 1, ch) * filter[1][2] +
+                        get_pixel(r + 1, c - 1, ch) * filter[2][0] + get_pixel(r + 1, c, ch) * filter[2][1] + get_pixel(r + 1, c + 1, ch) * filter[2][2];
                 }
             }
         }
 
-        result.reshape({ rows, columns, RGB });
         return result;
     }
 
@@ -227,9 +226,6 @@ PYBIND11_MODULE(_core, m) {
     )pbdoc");
 
     m.def("graph_example", &matplot_example, "function generating a graph using matplot");
-
-        Some other explanation about the graph function.
-    )pbdoc");
 
     m.def("filter_signal", &filter_signal, R"pbdoc(
         Filter 1D or 2D RGB signal based on given filter ID.
