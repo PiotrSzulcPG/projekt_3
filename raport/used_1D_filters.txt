@@ -1,0 +1,38 @@
+Filtry typu kernel są szeroko stosowane w przetwarzaniu sygnałów 1D. Poniżej przedstawiam kilka przykładów takich filtrów:
+
+### 1. Filtr Dolnoprzepustowy (Low-pass filter)
+Służy do wygładzania sygnału, eliminując wysokie częstotliwości. Przykład to prosty filtr uśredniający:
+
+Kernel: `[1/3, 1/3, 1/3]`
+
+### 2. Filtr Górnoprzepustowy (High-pass filter)
+Służy do podkreślania zmian w sygnale, eliminując niskie częstotliwości. Przykład to filtr różnicowy:
+
+Kernel: `[-1, 1]`
+
+### 3. Filtr Sobela (Sobel filter)
+Stosowany głównie do wykrywania krawędzi. Przykład dla sygnału 1D to:
+
+Kernel: `[-1, 0, 1]`
+
+### 4. Filtr Środkowouśredniający (Median filter)
+To filtr nieliniowy, który zastępuje każdą próbkę medianą sąsiednich próbek. Przykład dla okna o rozmiarze 3:
+
+Kernel: `[1, 1, 1]` (choć faktycznie działa na zasadzie sortowania i wybierania mediany, a nie sumowania z wagami)
+
+### 5. Filtr Laplace'a (Laplacian filter)
+Stosowany do wykrywania miejsc szybkich zmian (druga pochodna sygnału):
+
+Kernel: `[1, -2, 1]`
+
+### 6. Filtr Gaussowski (Gaussian filter)
+Służy do wygładzania sygnału z zachowaniem pewnych właściwości statystycznych. Kernel dla standardowego rozkładu Gaussa o odchyleniu standardowym σ=1:
+
+Kernel: `[0.27406862, 0.45186276, 0.27406862]`
+
+### 7. Filtr Średniej Ruchomej (Moving average filter)
+Prosty filtr, który wygładza sygnał poprzez uśrednianie wartości z określonego okna. Dla okna o rozmiarze 5:
+
+Kernel: `[1/5, 1/5, 1/5, 1/5, 1/5]`
+
+Każdy z powyższych filtrów może być stosowany w różnych kontekstach przetwarzania sygnałów, w zależności od wymagań i celów analizy.
