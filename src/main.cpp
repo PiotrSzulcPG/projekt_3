@@ -43,7 +43,6 @@ void matplot_1d_example(py::array_t<double> x, py::array_t<double> y)
     mat::xlabel("x");
     mat::ylabel("y");
 
-    mat::show();
     mat::save("raport/sine_plot", "png");
 }
 
@@ -68,7 +67,6 @@ void matplot_1d_one_input(py::array_t<double> y)
     mat::xlabel("x");
     mat::ylabel("y");
 
-    mat::show();
     mat::save("raport/one_input_sine_plot", "png");
 }
 py::array_t<double> filter_signal(py::array_t<double> data_array, std::string type) {
