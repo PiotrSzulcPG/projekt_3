@@ -199,7 +199,7 @@ py::array_t<double> generate_signal(std::string type, double amplitude, double f
     else if (type == "sqr") {
         for (unsigned t = 0; t < length; t++)
         {
-            output_signal_pointer[t] = (2.0 * amplitude / PI) * atan(tan((2.0 * PI * frequency * t + phase) / 2.0)) + (2.0 * amplitude / PI) * atan(1.0 / tan((PI * frequency * t + phase) / 2.0));
+            output_signal_pointer[t] = (2.0 * amplitude / PI) * atan(tan((PI * frequency * t + phase) / 2.0)) + (amplitude / PI) * atan(1.0 / tan((PI * frequency * t + phase) / 2.0));
         }
     }
     else if (type == "tri") {
