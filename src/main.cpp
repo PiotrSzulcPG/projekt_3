@@ -4,6 +4,7 @@
 #include <pybind11/numpy.h>
 #include <cmath>
 #include <string>
+#include <vector>
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
@@ -15,18 +16,34 @@ int add(int i, int j) {
     return i + j;
 }
 
-int example_graph() {
-    using namespace matplot;
+void matplot_example(py::array_t<double> x, py::array_t<double> y)
+{
+    py::buffer_info buf_x = x.request();
+    py::buffer_info buf_y = y.request();
+    if (buf_x.ndim != 1 || buf_y.ndim != 1)
+    {
+        std::cout << "invalid dimensions";
+        return;
+    }
+    if (buf_x.shape[0] != buf_y.shape[0])
+    {
+        std::cout << "ivalid sizes";
+        return;
+    }
+    int size = buf_x.shape[0];
+    std::vector<double> v_x, v_y;
+    for (int i = 0; i < size; i++)
+    {
+        v_x.push_back(x.at(i));
+        v_y.push_back(y.at(i));
+    }
+    matplot::plot(v_x, v_y)->color({ 0.f, 0.7f, 0.9f });
+    matplot::title("1-D Line Plot");
+    matplot::xlabel("x");
+    matplot::ylabel("y");
 
-    std::vector<double> x = linspace(0, 10, 150);
-    std::vector<double> y = transform(x, [](auto x) { return cos(5 * x); });
-    plot(x, y)->color({ 0.f, 0.7f, 0.9f });
-    title("2-D Line Plot");
-    xlabel("x");
-    ylabel("cos(5x)");
-
-    show();
-    return 0;
+    matplot::show();
+    matplot::save("raport/sine_plot", "png");
 }
 
 
@@ -209,8 +226,7 @@ PYBIND11_MODULE(_core, m) {
         Some other explanation about the subtract function.
     )pbdoc");
 
-    m.def("graph_example", &example_graph, R"pbdoc(
-        Generate example graph using matplot++
+    m.def("graph_example", &matplot_example, "function generating a graph using matplot");
 
         Some other explanation about the graph function.
     )pbdoc");
