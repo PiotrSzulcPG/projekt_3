@@ -9,7 +9,7 @@
 ## Test call
 
 ```python
-import scikit_build_example // TODO: zmiana nazwy (w pyproject.toml?)
+import scikit_build_example
 
 scikit_build_example.greeting()
 ```
