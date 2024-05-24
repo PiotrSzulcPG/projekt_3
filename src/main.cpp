@@ -9,6 +9,8 @@
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 
+const double PI = 3.14159265;
+
 namespace py = pybind11;
 namespace mat= matplot;
 int add(int i, int j) {
@@ -180,7 +182,48 @@ py::array_t<double> filter_signal(py::array_t<double> data_array, std::string ty
 
 }
 
-// Edge detection function (FIX: RGB, not grayscale)
+// Signal generation function (type = [sin, sqr, tri, saw], amplitude in __, frequency in Hz, length in seconds, phase in rad, rate in Hz)
+py::array_t<double> generate_signal(std::string type, double amplitude, double frequency, unsigned length, double phase = 0, double rate = 44100) {
+    length = length * rate; // Change length to seconds
+    frequency = 2 * PI * frequency / rate; // Change to frequency to Hz [FIX: for now 440 Hz is around 70 (2*pi difference?)]
+
+    // Processing data from Python to C++
+    auto output_signal = py::array_t<double>(length);
+    auto output_signal_buffer = output_signal.request();
+    double* output_signal_pointer = static_cast<double*>(output_signal_buffer.ptr);
+
+    // Generating functions
+    if (type == "sin") {
+        for (unsigned t = 0; t < length; t++)
+        {
+            output_signal_pointer[t] = amplitude * sin(2.0 * PI * frequency * t + phase);
+        }
+    }
+    else if (type == "sqr") {
+        for (unsigned t = 0; t < length; t++)
+        {
+            output_signal_pointer[t] = (2.0 * amplitude / PI) * atan(tan((2.0 * PI * frequency * t + phase) / 2.0)) + (2.0 * amplitude / PI) * atan(1.0 / tan((PI * frequency * t + phase) / 2.0));
+        }
+    }
+    else if (type == "tri") {
+        for (unsigned t = 0; t < length; t++)
+        {
+            output_signal_pointer[t] = (2.0 * amplitude / PI) * asin(sin(2.0 * PI * frequency * t + phase));
+        }
+    }
+    else if (type == "saw") {
+        for (unsigned t = 0; t < length; t++)
+        {
+            output_signal_pointer[t] = (2.0 * amplitude / PI) * atan(tan((2.0 * PI * frequency * t + phase) / 2.0));
+        }
+    }
+    else {
+        throw std::runtime_error("Incorrect type of function");
+    }
+    return output_signal;
+}
+
+// Edge detection function
 py::array_t<double> detect_edge(py::array_t<double> data_array) { 
     py::buffer_info buf = data_array.request();
 
@@ -252,6 +295,18 @@ PYBIND11_MODULE(_core, m) {
     m.def("two_input_1d", &matplot_1d_example, "function generating a graph with two inputs using matplot");
 
     m.def("one_input_1d", &matplot_1d_one_input, "function generating a graph with one input using matplot");
+
+    m.def("generate_signal", &generate_signal, R"pbdoc(
+        Generates signal with given amplitude, frequency, length and phaze
+
+        Parameters:
+        Amplitude []: How big is amplitude in a signal, or in other words how loud is the audio
+        Frequency [Hz]: 
+        Length [seconds]
+        Phase []
+        
+        Some other explanation about the signal generation.
+    )pbdoc");
 
     m.def("detect_edge", &detect_edge, R"pbdoc(
         Takes 2D array as an input and outputs edge detection using Sobel operator
