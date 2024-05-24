@@ -1,10 +1,9 @@
-### README OUTDATED! ###
-
-# projekt3_test
+# projekt3
 ## Installation
 
 - Clone this repository
-- `pip install ./projekt_3`
+- Go to directory of cloned repository
+- `pip install .`
 
 ## Test call
 
